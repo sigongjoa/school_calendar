@@ -11,12 +11,14 @@ interface CalendarStore {
     events: SchoolEvent[];
     examPeriods: ExamPeriod[];
     isLoading: boolean;
+    isSyncing: boolean;
 
     // Actions
     nextMonth: () => void;
     prevMonth: () => void;
     setToday: () => void;
     fetchMonthEvents: () => Promise<void>;
+    syncAllSchedules: () => Promise<void>;
 
     // Ref to refresh
     invalidate: () => Promise<void>;
@@ -28,6 +30,7 @@ export const useCalendarStore = create<CalendarStore>((set) => ({
     events: [],
     examPeriods: [],
     isLoading: false,
+    isSyncing: false,
 
     nextMonth: () => {
         set((state) => ({ currentDate: addMonths(state.currentDate, 1) }));
@@ -60,6 +63,18 @@ export const useCalendarStore = create<CalendarStore>((set) => ({
             console.error("Failed to fetch calendar events", err);
         } finally {
             set({ isLoading: false });
+        }
+    },
+
+    syncAllSchedules: async () => {
+        set({ isSyncing: true });
+        try {
+            await scheduleApi.syncAll();
+            await useCalendarStore.getState().fetchMonthEvents();
+        } catch (err) {
+            console.error("Failed to sync all schedules", err);
+        } finally {
+            set({ isSyncing: false });
         }
     },
 

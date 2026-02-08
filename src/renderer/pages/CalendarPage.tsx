@@ -14,7 +14,7 @@ import {
     getDay,
 } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Filter, Download, Building2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Filter, Download, Building2, RefreshCcw } from 'lucide-react';
 import clsx from 'clsx';
 import { CATEGORY_CONFIG, EventCategory } from '../types';
 import { useSchoolStore } from '../stores/useSchoolStore';
@@ -22,7 +22,10 @@ import { useCalendarStore } from '../stores/useCalendarStore';
 
 const CalendarPage: React.FC = () => {
     const { schools, fetchSchools } = useSchoolStore();
-    const { currentDate, nextMonth, prevMonth, setToday, events, fetchMonthEvents } = useCalendarStore();
+    const {
+        currentDate, nextMonth, prevMonth, setToday,
+        events, fetchMonthEvents, syncAllSchedules, isSyncing
+    } = useCalendarStore();
 
     // Toggled school IDs for filtering
     const [visibleSchoolIds, setVisibleSchoolIds] = useState<Set<number>>(new Set());
@@ -100,10 +103,23 @@ const CalendarPage: React.FC = () => {
                         </button>
                     </div>
 
-                    <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl shadow-md hover:bg-indigo-700 transition-all active:scale-95 text-sm font-semibold">
-                        <Download className="w-4 h-4" />
-                        내보내기
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={syncAllSchedules}
+                            disabled={isSyncing}
+                            className={clsx(
+                                "flex items-center gap-2 px-4 py-2 bg-white border rounded-xl shadow-sm text-sm font-semibold transition-all active:scale-95 disabled:opacity-50",
+                                isSyncing ? "text-indigo-400" : "text-gray-700 hover:bg-gray-50"
+                            )}
+                        >
+                            <RefreshCcw className={clsx("w-4 h-4", isSyncing && "animate-spin")} />
+                            월별 업데이트
+                        </button>
+                        <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl shadow-md hover:bg-indigo-700 transition-all active:scale-95 text-sm font-semibold">
+                            <Download className="w-4 h-4" />
+                            내보내기
+                        </button>
+                    </div>
                 </div>
             </div>
 

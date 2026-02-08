@@ -54,8 +54,10 @@ if (!fs.existsSync(SCREENSHOT_DIR)) {
 
         // 4. Calendar View and Toggles
         console.log('Navigating to Calendar...');
-        await page.goto(baseUrl + '#/calendar', { waitUntil: 'networkidle' });
-        await page.waitForTimeout(3000);
+        await page.goto(baseUrl + '#/calendar');
+        console.log('Waiting for Calendar to load...');
+        await page.waitForSelector('text=월별 업데이트', { timeout: 15000 });
+        await page.waitForTimeout(1000);
 
         // Go to March 2026
         console.log('Moving to March 2026...');
@@ -63,6 +65,21 @@ if (!fs.existsSync(SCREENSHOT_DIR)) {
         if (await nextButtons.count() > 0) {
             await nextButtons.first().click();
             await page.waitForTimeout(2000);
+        }
+
+        // Test Sync Button
+        console.log('Testing "월별 업데이트" button...');
+        const syncButton = page.locator('button').filter({ hasText: '월별 업데이트' });
+        if (await syncButton.count() > 0) {
+            console.log('Clicking Sync Button...');
+            await syncButton.click();
+            await page.waitForTimeout(500); // Small wait
+            console.log('Capturing syncing state...');
+            await page.screenshot({ path: path.join(SCREENSHOT_DIR, '06_calendar_syncing.png') });
+            console.log('Waiting for sync to finish...');
+            await page.waitForTimeout(8000); // Wait longer for NEIS sync
+        } else {
+            console.log('Sync Button NOT found!');
         }
 
         console.log('Capturing full Calendar (March)...');

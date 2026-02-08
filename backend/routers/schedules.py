@@ -204,23 +204,25 @@ async def sync_school_schedule(school_id: int):
 
 @router.post("/sync-all")
 async def sync_all_schools():
-    # Helper to iterate all schools and calling logic similar to above.
-    # For MVP, maybe loop through all IDs.
-    conn = get_db_connection()
-    schools = conn.execute("SELECT id FROM schools").fetchall()
-    conn.close()
-    
-    results = []
-    total = 0
-    now_iso = datetime.now().isoformat()
-
-    for row in schools:
-        res = await sync_school_schedule(row['id']) # This will open its own connection
-        results.append(res)
-        total += res.synced_count
+    try:
+        # Helper to iterate all schools and calling logic similar to above.
+        conn = get_db_connection()
+        schools = conn.execute("SELECT id FROM schools").fetchall()
+        conn.close()
         
-    return {
-        "results": results,
-        "total_synced": total,
-        "synced_at": now_iso
-    }
+        results = []
+        total = 0
+        now_iso = datetime.now().isoformat()
+
+        for row in schools:
+            res = await sync_school_schedule(row['id'])
+            results.append(res)
+            total += res["synced_count"]
+            
+        return {
+            "results": results,
+            "total_synced": total,
+            "synced_at": now_iso
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
