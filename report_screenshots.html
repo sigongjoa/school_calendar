@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>UI Verification Report</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #f4f4f9;
+        }
+
+        .screenshot {
+            margin-bottom: 30px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .screenshot img {
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+
+        .screenshot h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>School Calendar UI Verification Report</h1>
+        <p>Generated on: <span id="date"></span></p>
+    </div>
+    <div id="content"></div>
+
+    <script>
+        document.getElementById('date').innerText = new Date().toLocaleString();
+        // Use relative paths from the perspective of this HTML file
+        const screenshots = [
+            { title: "01. Dashboard", path: "screenshots/01_dashboard.png" },
+            { title: "02. School Management", path: "screenshots/02_school_management.png" },
+            { title: "03. Search Results", path: "screenshots/03_search_results.png" },
+            { title: "04. Calendar (Full View)", path: "screenshots/04_calendar_full.png" },
+            { title: "05. Calendar (Filtered View)", path: "screenshots/05_calendar_filtered.png" }
+        ];
+
+        const container = document.getElementById('content');
+        screenshots.forEach(s => {
+            const div = document.createElement('div');
+            div.className = 'screenshot';
+            div.innerHTML = `
+                <h2>${s.title}</h2>
+                <img src="${s.path}" onerror="this.innerHTML='Image not found: ${s.path}'">
+            `;
+            container.appendChild(div);
+        });
+    </script>
+</body>
+
+</html>
